@@ -12,7 +12,10 @@ interface DroneResult {
   snr: number
   model: string
   distance: number | null
-  allCandidates: { freq: number; score: number; harmonics: number[] }[]
+  allCandidates: { freq?: number; f0?: number; score: number; harmonics: number[]; matchCount?: number }[]
+  matchCount?: number
+  peakCount?: number
+  debug?: Record<string, string>
   analysis: string
   timestamp: string
 }
@@ -389,8 +392,22 @@ export default function DronePage() {
 
             {/* AI analysis */}
             <div className="card p-4" style={{ background: 'rgba(255,255,255,0.02)' }}>
-              <p className="text-sm leading-relaxed" style={{ color: 'var(--muted)' }}>{result.analysis}</p>
+              <p className="text-sm leading-relaxed" style={{ color: 'var(--muted)' }}>{result.analysis || (result.detected ? '' : 'Kein Drohnengeräusch erkannt.')}</p>
             </div>
+            {/* Debug info */}
+            {result.debug && (
+              <div className="card p-4" style={{background:'rgba(255,255,255,0.02)',border:'1px solid var(--border)'}}>
+                <div className="text-xs font-semibold mb-2 uppercase tracking-wider" style={{color:'var(--dimmed)'}}>Debug · FFT-Statistik</div>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {Object.entries(result.debug).map(([k,v]) => (
+                    <div key={k} className="flex justify-between text-xs px-2 py-1 rounded" style={{background:'rgba(255,255,255,0.03)'}}>
+                      <span style={{color:'var(--dimmed)'}}>{k}</span>
+                      <span className="font-mono" style={{color:'var(--muted)'}}>{v as string}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
